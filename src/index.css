@@ -8,6 +8,7 @@
     height: calc(100vh - 64px);
 }
 
+
 .events {
     margin: 0;
     padding: 0;
@@ -26,4 +27,13 @@
 }
 .notes-month section {
     font-size: 28px;
+}
+
+.calendar{
+    padding: 1rem;
+    height: 100%;
+}
+
+.username{
+    color: white
 }

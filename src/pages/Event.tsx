@@ -1,5 +1,5 @@
-import React, { FC, useEffect, useState } from "react";
-import { Button, Layout, Modal, Row } from "antd";
+import React, { FC, useEffect } from "react";
+import { Layout, Modal } from "antd";
 import EventCalendar from "../components/EventCalendar";
 import EventForm from "../components/EventForm";
 import { useActions } from "../hooks/useActions";
@@ -7,41 +7,34 @@ import { useTypedSelector } from "../hooks/useTypedSelector";
 import { selectEvent } from "../store/reducers/event";
 import { IEvent } from "../models/IEvent";
 import { selectAuth } from "../store/reducers/auth";
+import { useAppContext } from "../App";
 
 const Event: FC = () => {
   const { fetchGuests, createEvent, fetchEvents } = useActions();
   const { guests, events } = useTypedSelector(selectEvent);
   const { user } = useTypedSelector(selectAuth);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const { modal, setModal } = useAppContext();
   useEffect(() => {
     fetchGuests();
     fetchEvents(user.username);
   }, []);
 
   const addNewEvent = (event: IEvent) => {
-    setIsModalOpen(false);
+    setModal(false);
     createEvent(event);
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
   const closeModal = () => {
-    setIsModalOpen(false);
+    setModal(false);
   };
 
   return (
-    <Layout>
+    <Layout className="h100">
       <EventCalendar events={events} />
-      <Row justify="center">
-        <Button onClick={openModal}>Добавить событие</Button>
-      </Row>
+
       <Modal
         title="Добавить событие"
-        open={isModalOpen}
+        open={modal}
         footer={null}
         onCancel={closeModal}
       >

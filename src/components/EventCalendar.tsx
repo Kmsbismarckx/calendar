@@ -26,7 +26,7 @@ const EventCalendar: FC<EventCalendarProps> = (props) => {
     );
   };
 
-  return <Calendar dateCellRender={dateCellRender} />;
+  return <Calendar dateCellRender={dateCellRender} className="calendar" />;
 };
 
 export default EventCalendar;

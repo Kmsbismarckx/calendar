@@ -1,23 +1,47 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { AuthActionEnum, AuthState } from "./types";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  AuthState,
+  SetUserPayload,
+  SetAuthPayload,
+  SetIsLoadingPayload,
+  SetErrorPayload,
+} from "./types";
 import { RootState } from "../../index";
+import { IUser } from "../../../models/IUser";
 
 const initialState: AuthState = {
-  isAuth: false,
+  isAuth: !!localStorage.getItem("auth"),
+  user: {
+    username: localStorage.getItem("auth")
+      ? localStorage.getItem("username")
+      : "",
+  } as IUser,
+  isLoading: false,
+  error: "",
 };
 
 const authSlice = createSlice({
-  name: AuthActionEnum.AUTH,
+  name: "auth",
   initialState,
   reducers: {
-    set(state, action) {
-      state.isAuth = action.payload;
+    setAuth(state, { payload }: PayloadAction<SetAuthPayload>) {
+      state.isAuth = payload;
+      state.isLoading = false;
+    },
+    setUser(state, { payload }: PayloadAction<SetUserPayload>) {
+      state.user = payload;
+    },
+    setIsLoading(state, { payload }: PayloadAction<SetIsLoadingPayload>) {
+      state.isLoading = payload;
+    },
+    setError(state, { payload }: PayloadAction<SetErrorPayload>) {
+      state.error = payload;
     },
   },
 });
 
 export default authSlice.reducer;
 
-export const { set } = authSlice.actions;
+export const { setAuth, setUser, setIsLoading, setError } = authSlice.actions;
 
 export const selectAuth = (state: RootState) => state.isAuth;

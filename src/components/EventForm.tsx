@@ -1,0 +1,85 @@
+import React, { FC, useState } from "react";
+import { Button, DatePicker, Form, Input, Row, Select } from "antd";
+import { rules } from "../utils/rules";
+import { IUser } from "../models/IUser";
+import { IEvent } from "../models/IEvent";
+import dayjs, { Dayjs } from "dayjs";
+import { formatDate } from "../utils/date";
+import { useTypedSelector } from "../hooks/useTypedSelector";
+import { selectAuth } from "../store/reducers/auth";
+
+interface EventFormProps {
+  guests: IUser[];
+  submit: (event: IEvent) => void;
+  currentEventDate?: string;
+}
+
+const EventForm: FC<EventFormProps> = (props) => {
+  const [event, setEvent] = useState<IEvent>({
+    author: "",
+    date: "",
+    description: "",
+    guest: "",
+  } as IEvent);
+
+  const { user } = useTypedSelector(selectAuth);
+
+  const selectDate = (date: Dayjs | null) => {
+    if (date) {
+      setEvent({ ...event, date: formatDate(date) });
+    }
+  };
+
+  const submitForm = () => {
+    props.submit({ ...event, author: user.username });
+  };
+
+  const onSetEvent = (e: any) =>
+    setEvent({ ...event, description: e.target.value });
+
+  const onChangeDate = (date: Dayjs | null): void => {
+    selectDate(date);
+  };
+
+  const onGuestChange = (guest: string) => {
+    setEvent({ ...event, guest });
+  };
+
+  return (
+    <Form onFinish={submitForm}>
+      <Form.Item
+        label="Описание события"
+        name="description"
+        rules={[rules.required()]}
+      >
+        <Input onChange={onSetEvent} />
+      </Form.Item>
+      <Form.Item
+        label="Дата события"
+        name="date"
+        rules={[rules.required(), rules.isDateAfter("Нельзя создать событие")]}
+        initialValue={dayjs()}
+      >
+        <DatePicker onChange={onChangeDate} />
+      </Form.Item>
+      <Form.Item label="Пользователи" name="users" rules={[rules.required()]}>
+        <Select onChange={onGuestChange}>
+          {props.guests.map((guest) => (
+            <Select.Option key={guest.username} value={guest.username}>
+              {guest.username}
+            </Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
+      <Row justify="end">
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Создать
+          </Button>
+        </Form.Item>
+      </Row>
+    </Form>
+  );
+};
+
+export default EventForm;
